@@ -1,9 +1,9 @@
-import pandas as pd
-import geopandas as gpd
 import folium
+import geopandas as gpd
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 from streamlit_folium import folium_static
-import plotly.express as px
 
 # Carregar os dados processados
 df_acidentes = pd.read_csv('acidentes_processados.csv', sep=';')
@@ -113,7 +113,7 @@ def criar_grafico_mortalidade(df, titulo):
     df_mortalidade['codigo_ibge'] = df_mortalidade['codigo_ibge'].astype(str)  # Converter para string
     df_mortalidade = df_mortalidade.merge(gdf_mapa[['id', 'name']], left_on='codigo_ibge', right_on='id', how='left')
 
-    fig = px.bar(
+    fig = px.line(
         df_mortalidade,
         x='name',
         y='indice_mortalidade',
@@ -161,6 +161,22 @@ def criar_grafico_tipo_acidente(df, titulo):
     )
     return fig.update_layout(width=800, height=600)
 
+meses = {
+    1: 'Janeiro',
+    2: 'Fevereiro',
+    3: 'Março',
+    4: 'Abril',
+    5: 'Maio',
+    6: 'Junho',
+    7: 'Julho',
+    8: 'Agosto',
+    9: 'Setembro',
+    10: 'Outubro',
+    11: 'Novembro',
+    12: 'Dezembro'
+}
+numero_mes = mes_selecionado.astype(int)
+nome_mes = meses[numero_mes]
 
 # Definir o título do gráfico com base nas seleções
 if ano_selecionado == 'Todos os Anos' and mes_selecionado == 'Todos os Meses':
@@ -170,13 +186,15 @@ if ano_selecionado == 'Todos os Anos' and mes_selecionado == 'Todos os Meses':
     titulo_grafico_condicoes = 'Quantidade de Acidentes por Condições Meteorológicas (Todos os Anos)'
     titulo_grafico_fase_dia = 'Quantidade de Acidentes por Fase do Dia (Todos os Anos)'
     titulo_grafico_combinado = 'Quantidade de Acidentes  (Todos os Anos)'
+
 elif ano_selecionado == 'Todos os Anos':
-    titulo_grafico = f'Quantidade de Acidentes em {mes_selecionado} (Todos os Anos)'
-    titulo_grafico_obitos = f'Quantidade de Acidentes com Óbitos em {mes_selecionado} (Todos os Anos)'
-    titulo_grafico_mortalidade = f'Cidades com Maiores Índices de Mortalidade em {mes_selecionado} (Todos os Anos)'
-    titulo_grafico_condicoes = f'Quantidade de Acidentes por Condições Meteorológicas em {mes_selecionado} (Todos os Anos)'
-    titulo_grafico_fase_dia = f'Quantidade de Acidentes por Fase do Dia em {mes_selecionado} (Todos os Anos)'
-    titulo_grafico_combinado = f'Quantidade de Acidentes {mes_selecionado} (Todos os Anos)'
+    titulo_grafico = f'Quantidade de Acidentes em {nome_mes} (Todos os Anos)'
+    titulo_grafico_obitos = f'Quantidade de Acidentes com Óbitos em {nome_mes} (Todos os Anos)'
+    titulo_grafico_mortalidade = f'Cidades com Maiores Índices de Mortalidade em {nome_mes} (Todos os Anos)'
+    titulo_grafico_condicoes = f'Quantidade de Acidentes por Condições Meteorológicas em {nome_mes} (Todos os Anos)'
+    titulo_grafico_fase_dia = f'Quantidade de Acidentes por Fase do Dia em {nome_mes} (Todos os Anos)'
+    titulo_grafico_combinado = f'Quantidade de Acidentes {nome_mes} (Todos os Anos)'
+
 elif mes_selecionado == 'Todos os Meses':
     titulo_grafico = f'Quantidade de Acidentes por Mês em {ano_selecionado}'
     titulo_grafico_obitos = f'Quantidade de Acidentes com Óbitos por Mês em {ano_selecionado}'
@@ -184,13 +202,15 @@ elif mes_selecionado == 'Todos os Meses':
     titulo_grafico_condicoes = f'Quantidade de Acidentes por Condições Meteorológicas em {ano_selecionado}'
     titulo_grafico_fase_dia = f'Quantidade de Acidentes por Fase do Dia em {ano_selecionado}'
     titulo_grafico_combinado = f'Quantidade de Acidentes {ano_selecionado}'
+
 else:
-    titulo_grafico = f'Quantidade de Acidentes em {mes_selecionado} de {ano_selecionado}'
-    titulo_grafico_obitos = f'Quantidade de Acidentes com Óbitos em {mes_selecionado} de {ano_selecionado}'
-    titulo_grafico_mortalidade = f'Cidades com Maiores Índices de Mortalidade em {mes_selecionado} de {ano_selecionado}'
-    titulo_grafico_condicoes = f'Quantidade de Acidentes por Condições Meteorológicas em {mes_selecionado} de {ano_selecionado}'
-    titulo_grafico_fase_dia = f'Quantidade de Acidentes por Fase do Dia em {mes_selecionado} de {ano_selecionado}'
-    titulo_grafico_combinado = f'Quantidade de Acidentes por  {mes_selecionado} de {ano_selecionado}'
+    titulo_grafico = f'Quantidade de Acidentes em {nome_mes} de {ano_selecionado}'
+    titulo_grafico_obitos = f'Quantidade de Acidentes com Óbitos em {nome_mes} de {ano_selecionado}'
+    titulo_grafico_mortalidade = f'Cidades com Maiores Índices de Mortalidade em {nome_mes} de {ano_selecionado}'
+    titulo_grafico_condicoes = f'Quantidade de Acidentes por Condições Meteorológicas em {nome_mes} de {ano_selecionado}'
+    titulo_grafico_fase_dia = f'Quantidade de Acidentes por Fase do Dia em {nome_mes} de {ano_selecionado}'
+    titulo_grafico_combinado = f'Quantidade de Acidentes por  {nome_mes} de {ano_selecionado}'
+
 
 
 # Exibir o mapa no dashboard
@@ -217,6 +237,7 @@ st.plotly_chart(criar_grafico_fase_dia(df_filtrado, titulo_grafico_fase_dia))
 
 st.header(titulo_grafico_combinado)
 st.plotly_chart(criar_grafico_tipo_acidente(df_filtrado, titulo_grafico_combinado))
+
 
 
 

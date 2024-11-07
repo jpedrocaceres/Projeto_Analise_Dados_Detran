@@ -175,8 +175,9 @@ meses = {
     11: 'Novembro',
     12: 'Dezembro'
 }
-numero_mes = mes_selecionado.astype(int)
-nome_mes = meses[numero_mes]
+if mes_selecionado != 'Todos os Meses':
+    numero_mes = mes_selecionado
+    nome_mes = meses[numero_mes]
 
 # Definir o título do gráfico com base nas seleções
 if ano_selecionado == 'Todos os Anos' and mes_selecionado == 'Todos os Meses':

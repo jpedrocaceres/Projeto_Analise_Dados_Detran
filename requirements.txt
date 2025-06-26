@@ -1,4 +1,4 @@
-folium
+streamlit-folium
 geopandas
 pandas 
 plotly

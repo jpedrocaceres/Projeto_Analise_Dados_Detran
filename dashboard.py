@@ -3,7 +3,7 @@ import geopandas as gpd
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from streamlit_folium import folium_static
+from streamlit_folium import st_folium
 
 # Carregar os dados processados
 df_acidentes = pd.read_csv('acidentes_processados.csv', sep=';')

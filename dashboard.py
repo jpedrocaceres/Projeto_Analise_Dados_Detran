@@ -221,7 +221,7 @@ else:
 
 # Exibir o mapa no dashboard
 st.header('Mapa de Acidentes por Cidade')
-folium_static(m)
+st_folium(m)
 
 # Exibir o gráfico de barras no dashboard
 st.header(titulo_grafico)

@@ -14,10 +14,8 @@ if 'mes_acidente' not in df_acidentes.columns or 'ano_acidente' not in df_aciden
     raise KeyError("As colunas 'mes_acidente' e/ou 'ano_acidente' não estão presentes no CSV processado.")
 
 # Obter a lista de anos e meses disponíveis nos dados
-anos_disponiveis = df_acidentes['ano_acidente'].unique()
-anos_disponiveis.sort()
-meses_disponiveis = df_acidentes['mes_acidente'].unique()
-meses_disponiveis.sort()
+anos_disponiveis = sorted(df_acidentes['ano_acidente'].unique())
+meses_disponiveis = sorted(df_acidentes['mes_acidente'].unique())
 
 # Configurar o Streamlit para posicionar a caixa de seleção à esquerda
 st.title('Análise de Acidentes em Mato Grosso do Sul')
@@ -42,7 +40,8 @@ if 'dia_semana' not in df_filtrado.columns:
     raise KeyError("A coluna 'dia_semana' não está presente no DataFrame filtrado.")
 
 # Agrupar os dados de acidentes pela coluna 'codigo_ibge' após filtragem
-acidentes_por_cidade = df_filtrado.groupby('codigo_ibge').size().reset_index(name='qtd_acidente')
+acidentes_por_cidade = df_filtrado.groupby('codigo_ibge').size().reset_index()
+acidentes_por_cidade.columns = ['codigo_ibge', 'qtd_acidente']
 
 # Converter 'codigo_ibge' para tipo objeto (string)
 acidentes_por_cidade['codigo_ibge'] = acidentes_por_cidade['codigo_ibge'].astype(str)
@@ -68,16 +67,22 @@ folium.Choropleth(
 
 # Adicionar popups para exibir a quantidade de acidentes ao clicar na cidade
 for _, row in gdf_mapa.iterrows():
-    folium.Marker(
-        location=[row['geometry'].centroid.y, row['geometry'].centroid.x],
-        popup=folium.Popup(
-            f"<b>{row['name']}</b><br>"
-            f"<table>"
-            f"<tr><td>Quantidade de Acidentes:</td><td>{int(row['qtd_acidente'])}</td></tr>"
-            f"</table>",
-            max_width=300
-        )
-    ).add_to(m)
+    try:
+        # Get the centroid of the geometry
+        centroid = row.geometry.centroid
+        folium.Marker(
+            location=[centroid.y, centroid.x],
+            popup=folium.Popup(
+                f"<b>{row['name']}</b><br>"
+                f"<table>"
+                f"<tr><td>Quantidade de Acidentes:</td><td>{int(row['qtd_acidente'])}</td></tr>"
+                f"</table>",
+                max_width=300
+            )
+        ).add_to(m)
+    except (AttributeError, TypeError):
+        # Skip if geometry is invalid or missing
+        continue
 
 # Adicionar controle de camadas
 folium.LayerControl().add_to(m)
@@ -176,7 +181,7 @@ meses = {
     12: 'Dezembro'
 }
 if mes_selecionado != 'Todos os Meses':
-    numero_mes = mes_selecionado
+    numero_mes = int(mes_selecionado)
     nome_mes = meses[numero_mes]
 
 # Definir o título do gráfico com base nas seleções

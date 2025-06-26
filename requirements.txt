@@ -1,5 +1,5 @@
 folium
 geopandas
 pandas 
-plotly.express a
+plotly
 streamlit 
